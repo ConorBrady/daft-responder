@@ -12,20 +12,19 @@ logger = logging.getLogger('daft_scraper')
 hdlr = logging.FileHandler('scraper.log')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
-logger.addHandler(hdlr) 
+logger.addHandler(hdlr)
 logger.setLevel(logging.INFO)
 
-firstRun = True
 observedIds = set([])
 startUpTime = pytz.UTC.localize(datetime.datetime.now())
 logger.info("Program started")
 
 while True:
-   
+
     logger.info("Requesting feed")
 
     f = feedparser.parse("http://www.daft.ie/rss.daft?uid=1059539&id=602926&xk=158993")
-    
+
     logger.info("{0} entries recieved".format(len(f['entries'])))
     for entry in f['entries']:
         url = urlparse.urlparse(entry['link'])
@@ -35,25 +34,21 @@ while True:
         if pub_date < startUpTime:
             continue
 
-        if firstRun:
-            logger.error("Fatal error, first run should ignore feed")
-            raise Exception("First run should ignore feed") 
-
         if ident in observedIds:
-            continue 
+            continue
 
         observedIds.add(ident)
 
         message = """
-            Hey, 
+            Hey,
 
-            Got in pretty quick on this one :P 
+            Got in pretty quick on this one :P
 
-            I'd love to check the place out as soon as is convenient. My lease is 
+            I'd love to check the place out as soon as is convenient. My lease is
             going to be up at the end of month so I'm eager to find somewhere new.
 
             I'm a 25 yo male, working in a tech company in the IFSC called HubSpot.
-            Tend to spend a lot of time in the living room looking for someone to 
+            Tend to spend a lot of time in the living room looking for someone to
             chat to, rock climbing or sitting in a cafe somewhere.
 
             Anyway, I look forward to the chance to view the place and get to meet you.
@@ -82,9 +77,7 @@ while True:
         else:
             logger.error(req.text)
 
-        firstRun = False
     if datetime.datetime.now().hour < 8:
         sleep(15*60)
     else:
         sleep(random.randint(5*60,10*60))
- 
