@@ -7,9 +7,10 @@ import pytz
 import requests
 import logging
 import random
+import textwrap
 
 logger = logging.getLogger('daft_scraper')
-hdlr = logging.FileHandler('scraper.log')
+hdlr = logging.FileHandler('/var/log/daft_responder')
 formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 hdlr.setFormatter(formatter)
 logger.addHandler(hdlr)
@@ -23,13 +24,13 @@ while True:
 
     logger.info("Requesting feed")
 
-    f = feedparser.parse("http://www.daft.ie/rss.daft?uid=1059539&id=602926&xk=158993")
+    f = feedparser.parse("http://www.daft.ie/rss.daft?uid=1059539&id=604432&xk=216025")
 
     logger.info("{0} entries recieved".format(len(f['entries'])))
     for entry in f['entries']:
         url = urlparse.urlparse(entry['link'])
         ident = urlparse.parse_qs(url.query)['id'][0]
-        pub_date = dateutil.parser.parse(entry['published'])
+        pub_date = dateutil.parser.parse(entry['published'])-datetime.timedelta(hours=1) # dafts inability to have correct timezones
 
         if pub_date < startUpTime:
             continue
@@ -39,10 +40,8 @@ while True:
 
         observedIds.add(ident)
 
-        message = """
+        message = textwrap.dedent("""\
             Hey,
-
-            Got in pretty quick on this one :P
 
             I'd love to check the place out as soon as is convenient. My lease is
             going to be up at the end of month so I'm eager to find somewhere new.
@@ -58,7 +57,7 @@ while True:
 
             Facebook: fb.com/conorjbrady
             LinkedIn: lnkdin.me/conor
-        """
+        """)
 
         req = requests.post("http://www.daft.ie/ajax_endpoint.php", data={
             'action': 'daft_contact_advertiser',
@@ -74,10 +73,12 @@ while True:
 
         if req.text == u'"Email successfully sent to advertiser"':
             logger.info("Email successfully sent to {0}".format(entry['link']))
+            now = pytz.UTC.localize(datetime.datetime.now())
+            logger.info("Response time of {0}".format(now-pub_date))
         else:
             logger.error(req.text)
 
     if datetime.datetime.now().hour < 8:
         sleep(15*60)
     else:
-        sleep(random.randint(5*60,10*60))
+        sleep(random.randint(2.5*60,5*60))
