@@ -7,8 +7,7 @@ import pytz
 import random
 import sys
 import logging
-
-import sender
+import yaml
 
 logger = logging.getLogger('daft_scraper')
 hdlr = logging.FileHandler('scraper.log')
@@ -21,7 +20,20 @@ observedIds = set([])
 startUpTime = pytz.UTC.localize(datetime.datetime.now())
 logger.info("Program started")
 
-while True:
+with open('input.yaml') as f:
+
+    payload = {
+        'action': 'daft_contact_advertiser',
+        'type': 'sharing',
+        'self_copy': '1',
+        'agent_id': ''
+    }
+
+    payload.update(yaml.safe_load(f))
+
+    logger.info("Has payload {0}".format(payload))
+
+    while True:
 
         logger.info("Requesting feed")
 
@@ -29,6 +41,7 @@ while True:
 
         logger.info("{0} entries recieved".format(len(f['entries'])))
         for entry in f['entries']:
+
             url = urlparse.urlparse(entry['link'])
             ident = urlparse.parse_qs(url.query)['id'][0]
             pub_date = dateutil.parser.parse(entry['published'])
@@ -40,7 +53,14 @@ while True:
                 continue
 
             observedIds.add(ident)
-            sender.email_to(ident)
+            payload["id"] = ident
+
+            req = requests.post("http://www.daft.ie/ajax_endpoint.php", data=payload)
+
+            if req.text == u'"Email successfully sent to advertiser"':
+                logger.info("Email successfully sent to {0}".format(ident))
+            else:
+                logger.error(req.text)
 
         if datetime.datetime.now().hour < 8:
             sleep(15*60)
