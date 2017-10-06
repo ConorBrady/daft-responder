@@ -52,8 +52,8 @@ with open('input.yaml') as f:
             ident = urlparse.parse_qs(url.query)['id'][0]
             pub_date = dateutil.parser.parse(entry['published'])
 
-            #if pub_date < startUpTime:
-               # continue
+            if pub_date < startUpTime:
+                continue
 
             if ident in observedIds:
                 continue
@@ -62,9 +62,12 @@ with open('input.yaml') as f:
             payload["id"] = ident
 	    
             logger.info("Sending payload {0}".format(payload))
-            req = requests.post("http://www.daft.ie/ajax_endpoint.php", data=payload)
-	    logger.info("Got response")
-	    logger.info("Sent with response {0}".format(req))
+            
+            req = requests.post("http://www.daft.ie/ajax_endpoint.php", data=payload, headers={
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36"
+            })
+            
+            logger.info("Sent with response {0}".format(req))
 
             if req.text == u'"Email successfully sent to advertiser"':
                 logger.info("Email successfully sent to {0}".format(ident))
