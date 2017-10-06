@@ -1,13 +1,11 @@
-from: John Smith
+---
+contact_number: 0822222222
 email: email@example
-contact_number: "0822222222"
+from: "John Smith"
 message: |
-Hey,
+    Hey,
 
-This is a test email
+    This is a test email
 
-Cheers,
-John
-
-Facebook http://fb.com/john
-LinkedIn http://lnkdin.me/john
+    Cheers,
+    John
