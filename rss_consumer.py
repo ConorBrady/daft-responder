@@ -8,6 +8,7 @@ import random
 import sys
 import logging
 import yaml
+import requests
 
 logger = logging.getLogger('daft_scraper')
 hdlr = logging.FileHandler('scraper.log')
