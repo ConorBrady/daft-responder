@@ -1,5 +1,5 @@
 ---
-contact_number: 0822222222
+contact_number: "0822222222"
 email: email@example
 from: "John Smith"
 message: |
