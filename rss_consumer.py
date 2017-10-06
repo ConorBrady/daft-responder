@@ -10,14 +10,18 @@ import logging
 
 import sender
 
-def start():
-    logger = logging.getLogger('daft_scraper')
+logger = logging.getLogger('daft_scraper')
+hdlr = logging.FileHandler('scraper.log')
+formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+hdlr.setFormatter(formatter)
+logger.addHandler(hdlr)
+logger.setLevel(logging.INFO)
 
-    observedIds = set([])
-    startUpTime = pytz.UTC.localize(datetime.datetime.now())
-    logger.info("Program started")
+observedIds = set([])
+startUpTime = pytz.UTC.localize(datetime.datetime.now())
+logger.info("Program started")
 
-    while True:
+while True:
 
         logger.info("Requesting feed")
 
