@@ -20,11 +20,16 @@ observedIds = set([])
 startUpTime = pytz.UTC.localize(datetime.datetime.now())
 logger.info("Program started")
 
+feed = sys.argv[1]
+ad_type = sys.argv[2]
+
+logger.info("Feed: {0}, Ad type: {1}".format(feed, ad_type))
+
 with open('input.yaml') as f:
 
     payload = {
         'action': 'daft_contact_advertiser',
-        'type': 'sharing',
+        'type': ad_type,
         'self_copy': '1',
         'agent_id': ''
     }
@@ -37,7 +42,7 @@ with open('input.yaml') as f:
 
         logger.info("Requesting feed")
 
-        f = feedparser.parse(sys.argv[0])
+        f = feedparser.parse(feed)
 
         logger.info("{0} entries recieved".format(len(f['entries'])))
         for entry in f['entries']:
@@ -46,8 +51,8 @@ with open('input.yaml') as f:
             ident = urlparse.parse_qs(url.query)['id'][0]
             pub_date = dateutil.parser.parse(entry['published'])
 
-            if pub_date < startUpTime:
-                continue
+            #if pub_date < startUpTime:
+               # continue
 
             if ident in observedIds:
                 continue
