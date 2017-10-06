@@ -5,6 +5,7 @@ import dateutil.parser
 import datetime
 import pytz
 import random
+import sys
 import logging
 
 import sender
@@ -20,7 +21,7 @@ def start():
 
         logger.info("Requesting feed")
 
-        f = feedparser.parse("http://www.daft.ie/rss.daft?uid=1059539&id=602926&xk=158993")
+        f = feedparser.parse(sys.argv[0])
 
         logger.info("{0} entries recieved".format(len(f['entries'])))
         for entry in f['entries']:
